@@ -1,0 +1,48 @@
+name: build and deploy algo.chenhuar.xyz
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  push:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      # This step uses an action created by a user which sets
+      # up Hugo on the runner and runs the hugo command to build
+      # the site
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+            hugo-version: '0.76.5'
+            extended: true
+
+      - name: Build
+        run: hugo --minify
+
+      # The last step deploys the site to my server by running
+      # the deploy script located in the ci directory
+      # within the repo
+      - name: deploy
+        run: source $GITHUB_WORKSPACE/CICD/deploy.sh
+        env:
+          # This section sets up the environment used by the
+          # deploy script. These values are injected from
+          # the repo's secret store
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
+          SERVER_DESTINATION: ${{ secrets.SERVER_DESTINATION }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
