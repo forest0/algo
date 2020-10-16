@@ -1,0 +1,102 @@
+defaultContentLanguage: zh-cn
+languageCode: zh-CN
+hasCJKLanguage: true
+
+title: 听取WA声一片
+
+author:
+  name: forest0
+  email: forest9643@gmail.com
+
+theme: LoveIt
+
+taxonomies:
+  category: categories
+  series: series
+  tag: tags
+
+params:
+  version: 0.2.X
+  app:
+    title: 听取WA声一片
+  page:
+    toc:
+      enable: true
+      keepStatic: false # 将目录保持在右侧而非文章上方
+      auto: true # 是否使侧边目录自动折叠展开
+    code:
+      copy: true # 是否显示代码块的复制按钮
+      maxShownLines: 15 # 默认展开显示的代码行数
+    math:
+      enable: true
+      blockLeftDelimiter: $$
+      blockRightDelimiter: $$
+      inlineLeftDelimiter: $
+      inlineRightDelimiter: $
+      copyTex: true
+      mhchem: false # 化学公式
+  search:
+      enable: true
+      # 搜索引擎的类型 ("lunr", "algolia")
+      type: lunr
+      # 文章内容最长索引长度
+      contentLength: 4000
+      # 搜索框的占位提示语
+      placeholder: ""
+      # LoveIt 新增 | 0.2.1 最大结果数目
+      maxResultLength: 10
+      # LoveIt 新增 | 0.2.3 结果内容片段长度
+      snippetLength: 50
+      # LoveIt 新增 | 0.2.1 搜索结果中高亮部分的 HTML 标签
+      highlightTag: "em"
+      # LoveIt 新增 | 0.2.4 是否在搜索索引中使用基于 baseURL 的绝对路径
+      absoluteURL: false
+
+menu:
+  main:
+    - identifier: posts
+      # 在名称 (允许 HTML 格式) 前添加其他信息, 例如图标
+      pre: ''
+      # 在名称 (允许 HTML 格式) 后添加其他信息, 例如图标
+      post: ''
+      name: 文章
+      url: /posts/
+      # 当鼠标悬停在此菜单链接上时, 将显示的标题
+      title: ''
+      weight: 1
+    - identifier: tags
+      pre: ''
+      post: ''
+      name: 标签
+      url: /tags/
+      title: ''
+      weight: 2
+    - identifier: categories
+      pre: ''
+      post: ''
+      name: 分类
+      url: /categories/
+      title: ''
+      weight: 3
+    - identifier: series
+      pre: ''
+      post: ''
+      name: 系列
+      url: /series/
+      title: ''
+      weight: 4
+
+markup:
+  highlight: # 语法高亮设置
+    # false 是必要的设置 see also: https://github.com/dillonzq/LoveIt/issues/158
+    noClasses: false
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    lineNumbersInTable: true
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
