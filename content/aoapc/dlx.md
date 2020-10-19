@@ -1,7 +1,7 @@
 ---
 title: "精确覆盖问题和DLX算法"
 date: 2020-10-18T21:02:26+08:00
-draft: true
+draft: false
 series:
   - AOAPC
 tags:
