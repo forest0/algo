@@ -1,5 +1,5 @@
 ---
-title: "精确覆盖问题和DLX算法"
+title: "覆盖问题和DLX算法"
 date: 2020-10-18T21:02:26+08:00
 draft: false
 series:
@@ -54,7 +54,7 @@ $1 \sim 7$的所有整数。
 
 但删除列并不是一个简单的操作，因为还需要把能覆盖它的行也一并删除掉（
 因为每列只能被一行所覆盖）。 为提高效率，
-我们需要一种能高效支持上述操作的数据结构，它就是 Knuth 的舞蹈链，
+我们需要一种能高效支持上述操作的数据结构，它就是 Donald 的舞蹈链，
 使用了舞蹈链的算法 X 通常被称为 DLX 算法。
 
 ## 舞蹈链 (Dancing Links)
@@ -73,6 +73,8 @@ $1 \sim 7$的所有整数。
 每一列的最上方虚拟结点的U指针指向这一列的最下方结点，
 最下方结点的D指针指向最上方的结点。
 
+[这篇博客对舞蹈链的跳舞过程描述得比较细致](https://www.cnblogs.com/grenet/p/3145800.html)
+
 另外，每列还维护一个 $S$ 值，表示这一列的普通结点个数（不含虚拟结点），
 这样可以每次可以找一个 $S$ 值最小的未删除列，进一步加快求解速度。
 
@@ -84,12 +86,19 @@ $1 \sim 7$的所有整数。
 
 ## 实现
 
+这里的代码整合了精确覆盖和可重复覆盖（元素允许被重复覆盖的条件下寻找最少数量的集合，
+重复的含义对应到$01$矩阵为每列至少一个$1$），
+注意**应用时行、列都从1开始编号**。
+
+行代表一个“决策”，列代表一个需要被覆盖的“任务”。
+
 ```cpp
 #ifndef DLX_H
 #define DLX_H
 
 #include <cstring>
 #include <vector>
+#include <cassert>
 
 // 顺着链表遍历除s外的其它元素
 #define _FOR(i,A,s) for (int i = A[s]; i != s; i = A[i])
@@ -112,6 +121,12 @@ class DLX {
 
     vector<int> ans;
 
+    // 仅有重复覆盖使用，用于剪枝
+    int ansd;
+    bool *vis;
+    vector<int> cur;
+
+    // 精确覆盖
     void remove(int c) {
         // 移除顶部虚拟结点，不再考虑元素c
         R[L[c]] = R[c];
@@ -126,9 +141,10 @@ class DLX {
                 --S[col[j]];
             }
     }
-
+    // 精确覆盖
     void restore(int c) {
-        // 递归过程，恢复时要严格按照移除的逆序才能恢复原状
+        // 递归过程，用逆序比较稳，
+        // TODO: 这里是否一定需要严格逆序？
         _FOR(i, U, c)
             _FOR(j, L, i) {
                 ++S[col[j]];
@@ -139,7 +155,7 @@ class DLX {
         R[L[c]] = c;
     }
 
-    bool dfs() {
+    bool dfsExactCover() {
         // 所有元素已覆盖完
         if (R[0] == 0) return true;
 
@@ -152,7 +168,7 @@ class DLX {
             ans.push_back(row[i]); // 选中集合row[i]
             _FOR(j, R, i) remove(col[j]); // 该集合也覆盖元素col[j]，后续无需再考虑
 
-            if (dfs()) return true;
+            if (dfsExactCover()) return true;
 
             _FOR(j, L, i) restore(col[j]);
             ans.pop_back();
@@ -162,14 +178,80 @@ class DLX {
         return false;
     }
 
+    bool solveExactCover(vector<int> &v) {
+        if (!dfsExactCover()) return false;
+        v = ans;
+        return true;
+    }
+
+    // 重复覆盖
+    void del(int c) {
+        _FOR(i, D, c) {
+            L[R[i]] = L[i];
+            R[L[i]] = R[i];
+        }
+        // 不用删去列为1的行，因为允许重复覆盖
+    }
+    // 重复覆盖
+    void add(int c) {
+        _FOR(i, U, c) L[R[i]] = R[L[i]] = i;
+    }
+
+    // 重复覆盖的估价函数
+    // 选中能覆盖当前列的所有行，同时去除这些行覆盖的所有列，
+    // 将此操作是为一层深度
+    int h() {
+        int cnt = 0;
+        memset(vis, false, sizeof(bool)*(COLUMN_AMOUNT+1));
+        _FOR(i, R, 0) {
+            if (vis[i]) continue;
+            ++cnt; vis[i] = true;
+            _FOR(j, D, i)
+                _FOR(k, R, j)
+                    vis[col[k]] = true;
+        }
+        return cnt;
+    }
+
+    void dfsAllowDuplicateCover(int d) {
+        if (d + h() >= ansd) return;
+        if (R[0] == 0) {
+            if (d < ansd) {
+                ansd = d;
+                ans = cur;
+            }
+            return;
+        }
+
+        int c = R[0];
+        _FOR(i, R, 0) if (S[i] < S[c]) c = i;
+
+        _FOR(i, D, c) {
+            del(i);
+            cur.push_back(row[i]);
+            _FOR(j, R, i) del(j);
+            dfsAllowDuplicateCover(d+1);
+            _FOR(j, L, i) add(j);
+            cur.pop_back();
+            add(i);
+        }
+    }
+
+    bool solveAllowDuplicateCover(vector<int> &v) {
+        dfsAllowDuplicateCover(0);
+        if (ans.empty()) return false;
+        v = ans;
+        return true;
+    }
+
 public:
     DLX(int column_amount, int max_node_amount)
-        : COLUMN_AMOUNT(column_amount), MAX_NODE_AMOUNT(max_node_amount),
+        : COLUMN_AMOUNT(column_amount), MAX_NODE_AMOUNT(max_node_amount+column_amount+1),
         S(new int[COLUMN_AMOUNT+1]),
         row(new int[MAX_NODE_AMOUNT]), col(new int[MAX_NODE_AMOUNT]),
         L(new int[MAX_NODE_AMOUNT]), R(new int[MAX_NODE_AMOUNT]),
         U(new int[MAX_NODE_AMOUNT]), D(new int[MAX_NODE_AMOUNT]),
-        ans({})
+        ans({}), ansd(0), vis(new bool[COLUMN_AMOUNT+1]), cur({})
     {
         // 虚拟结点
         for (int i = 0; i <= column_amount; ++i) {
@@ -190,12 +272,17 @@ public:
         if (R) delete [] R;
         if (U) delete [] U;
         if (D) delete [] D;
+        if (vis) delete [] vis;
     }
 
     void addRow(int r, const vector<int> &columns) {
+        assert(!columns.empty());
+
         int first = node_amount;
         int &idx = node_amount;
         for (auto c : columns) {
+            assert(c > 0); // 列必须从1开始编号
+
             L[idx] = idx - 1;
             R[idx] = idx + 1;
             D[idx] = c;
@@ -207,12 +294,13 @@ public:
             ++S[c]; ++idx;
         }
         L[first] = idx - 1; R[idx-1] = first;
+
+        ++ansd; // 最多全选
     }
 
-    bool solve(vector<int> &v) {
-        if (!dfs()) return false;
-        v = ans;
-        return true;
+    bool solve(vector<int> &v, bool isUniqueCover=true) {
+        if (isUniqueCover) return solveExactCover(v);
+        return solveAllowDuplicateCover(v);
     }
 
 };
@@ -235,10 +323,10 @@ int main(int argc, char *argv[]) {
     };
     for (int i = 0; i < 6; ++i) solver.addRow(i+1, rows[i]); // 行编号1开始
     vector<int> res;
-    if (solver.solve(res)) {
+    if (solver.solve(res, true)) {
         for (auto i : res) printf("%d ", i);
         puts("");
-    } else puts("no solution");
+    } else puts("No solution.");
     return 0;
 }
 ```
@@ -355,3 +443,7 @@ K---J----H-A-P-L
 
 [^1]: 这只是为文字叙述方便。
 整个舞蹈链的头结点在代码中并没有保存在特别的变量中，因为它总是结点0。
+
+## 参考
+
+[跳跃的舞者，舞蹈链（Dancing Links）算法——求解精确覆盖问题](https://www.cnblogs.com/grenet/p/3145800.html)
