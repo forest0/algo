@@ -87,6 +87,20 @@ menu:
       url: /series/
       title: ''
       weight: 4
+    - identifier: about
+      pre: ''
+      post: ''
+      name: 关于
+      url: /about/
+      title: ''
+      weight: 5
+    - identifier: github
+      pre: "<i class='fab fa-github fa-fw'></i>"
+      post: ''
+      name: ''
+      url: 'https://github.com/forest0/algo'
+      title: 'Github'
+      weight: 6
 
 markup:
   highlight: # 语法高亮设置
