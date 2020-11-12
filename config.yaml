@@ -39,6 +39,7 @@ params:
       copyTex: true
       mhchem: false # 化学公式
     comment:
+      enable: true
       valine:
         enable: true
         # 这俩默认公开
