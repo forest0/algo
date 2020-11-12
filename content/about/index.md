@@ -18,7 +18,7 @@ draft: false
 - 代码的可读性
 
 当然理想和现实之间总是有差距的，“好的解答”也很花费时间和精力，
-所以也想邀请各位小伙伴们[一起努力](https://github.com/forest0/algo/.github/CONTRIBUTING.md)：
+所以也想邀请各位小伙伴们[一起努力](https://github.com/forest0/algo/blob/main/.github/CONTRIBUTING.md)：
 - 如果你是大佬，来show下你的独到的思路或者绝妙的代码吧
 - 如果你也在刷题，也可以分享你的思路或代码，
 如果你能写出清晰易懂的解答那么应对面试官应该也很容易了
