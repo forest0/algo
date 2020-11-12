@@ -38,6 +38,28 @@ params:
       inlineRightDelimiter: $
       copyTex: true
       mhchem: false # 化学公式
+    comment:
+      valine:
+        enable: true
+        # 这俩默认公开
+        appId: "0oY57xjaaWexwTN7GLcm9MHO-MdYXbMMI"
+        appKey: "F5F8AD1DExNMEJxvI1t6kX2E"
+        placeholder: "o(*≧▽≦)ツ写得不错"
+        avatar: "mp"
+        # meta: ""
+        pageSize: 10
+        lang: "zh-CN"
+        visitor: true # 文章访问量统计
+        recordIP: false # 是否记录评论者IP
+        highlight: true # 代码高亮
+        enableQQ: false # 是否启用昵称框自动获取QQ昵称和QQ头像
+        # serverURLs: "" # 海外版本自动填写，国内自定义域名需要处理
+        # LoveIt 新增 | 0.2.6 emoji 数据文件名称, 默认是 "google.yml"
+        # ("apple.yml", "google.yml", "facebook.yml", "twitter.yml")
+        # 位于 "themes/LoveIt/assets/data/emoji/" 目录
+        # 可以在你的项目下相同路径存放你自己的数据文件:
+        # "assets/data/emoji/"
+        emoji: "apple.yml"
   search:
       enable: true
       # 搜索引擎的类型 ("lunr", "algolia")
