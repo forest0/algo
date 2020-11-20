@@ -1,3 +1,5 @@
+![build](https://github.com/forest0/algo/workflows/build/badge.svg)
+
 # 刷题笔记
 
 我和小伙伴们的刷题笔记。
