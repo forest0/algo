@@ -98,7 +98,7 @@ tags:
 
 {{< image src="/img/BIT_2.png" title="BIT查询" caption="BIT查询" linked=false width="700" >}}
 
-`query(l,r) == sum(r)`
+`query(l,r) == sum(r)-sum(l-1)`
 
 ```cpp
 int sum(x) {
